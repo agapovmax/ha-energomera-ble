@@ -43,7 +43,8 @@
       "already_in_progress": "This meter is already being set up.",
       "not_supported": "This device is not supported.",
       "reauth_successful": "PIN updated, the meter is being polled again.",
-      "reconfigure_successful": "PIN changed."
+      "reconfigure_successful": "PIN changed.",
+      "discovery_disabled": "Discovery of other meters is turned off in the integration options."
     }
   },
   "options": {
@@ -51,7 +52,12 @@
       "init": {
         "title": "Polling options",
         "data": {
-          "scan_interval": "Polling interval, seconds"
+          "scan_interval": "Polling interval, seconds",
+          "discover_others": "Offer to add other discovered meters"
+        },
+        "data_description": {
+          "scan_interval": "How often to read the meter. Polling too often with a weak signal causes more errors.",
+          "discover_others": "When off, Home Assistant will not show \"Discovered\" cards for other meters nearby (e.g. neighbours on the same pole). You can always add another meter of your own manually with \"Add entry\"."
         }
       }
     }
@@ -59,79 +65,204 @@
   "entity": {
     "sensor": {
       "energy_total": {
-        "name": "Energy total"
+        "name": "Energy total",
+        "state_attributes": {
+          "description": {
+            "name": "Description"
+          }
+        }
       },
       "energy_t1": {
-        "name": "Energy T1"
+        "name": "Energy T1",
+        "state_attributes": {
+          "description": {
+            "name": "Description"
+          }
+        }
       },
       "energy_t2": {
-        "name": "Energy T2"
+        "name": "Energy T2",
+        "state_attributes": {
+          "description": {
+            "name": "Description"
+          }
+        }
       },
       "energy_t3": {
-        "name": "Energy T3"
+        "name": "Energy T3",
+        "state_attributes": {
+          "description": {
+            "name": "Description"
+          }
+        }
       },
       "energy_t4": {
-        "name": "Energy T4"
+        "name": "Energy T4",
+        "state_attributes": {
+          "description": {
+            "name": "Description"
+          }
+        }
       },
       "energy_l1": {
-        "name": "Energy L1"
+        "name": "Energy L1",
+        "state_attributes": {
+          "description": {
+            "name": "Description"
+          }
+        }
       },
       "energy_l2": {
-        "name": "Energy L2"
+        "name": "Energy L2",
+        "state_attributes": {
+          "description": {
+            "name": "Description"
+          }
+        }
       },
       "energy_l3": {
-        "name": "Energy L3"
+        "name": "Energy L3",
+        "state_attributes": {
+          "description": {
+            "name": "Description"
+          }
+        }
       },
       "energy_today": {
-        "name": "Energy today"
+        "name": "Energy today",
+        "state_attributes": {
+          "description": {
+            "name": "Description"
+          }
+        }
       },
       "energy_today_t1": {
-        "name": "Energy today T1"
+        "name": "Energy today T1",
+        "state_attributes": {
+          "description": {
+            "name": "Description"
+          }
+        }
       },
       "energy_today_t2": {
-        "name": "Energy today T2"
+        "name": "Energy today T2",
+        "state_attributes": {
+          "description": {
+            "name": "Description"
+          }
+        }
       },
       "power_total": {
-        "name": "Power"
+        "name": "Power",
+        "state_attributes": {
+          "description": {
+            "name": "Description"
+          }
+        }
       },
       "power_l1": {
-        "name": "Power L1"
+        "name": "Power L1",
+        "state_attributes": {
+          "description": {
+            "name": "Description"
+          }
+        }
       },
       "power_l2": {
-        "name": "Power L2"
+        "name": "Power L2",
+        "state_attributes": {
+          "description": {
+            "name": "Description"
+          }
+        }
       },
       "power_l3": {
-        "name": "Power L3"
+        "name": "Power L3",
+        "state_attributes": {
+          "description": {
+            "name": "Description"
+          }
+        }
       },
       "voltage_l1": {
-        "name": "Voltage L1"
+        "name": "Voltage L1",
+        "state_attributes": {
+          "description": {
+            "name": "Description"
+          }
+        }
       },
       "voltage_l2": {
-        "name": "Voltage L2"
+        "name": "Voltage L2",
+        "state_attributes": {
+          "description": {
+            "name": "Description"
+          }
+        }
       },
       "voltage_l3": {
-        "name": "Voltage L3"
+        "name": "Voltage L3",
+        "state_attributes": {
+          "description": {
+            "name": "Description"
+          }
+        }
       },
       "current_l1": {
-        "name": "Current L1"
+        "name": "Current L1",
+        "state_attributes": {
+          "description": {
+            "name": "Description"
+          }
+        }
       },
       "current_l2": {
-        "name": "Current L2"
+        "name": "Current L2",
+        "state_attributes": {
+          "description": {
+            "name": "Description"
+          }
+        }
       },
       "current_l3": {
-        "name": "Current L3"
+        "name": "Current L3",
+        "state_attributes": {
+          "description": {
+            "name": "Description"
+          }
+        }
       },
       "cos_total": {
-        "name": "Power factor"
+        "name": "Power factor",
+        "state_attributes": {
+          "description": {
+            "name": "Description"
+          }
+        }
       },
       "frequency": {
-        "name": "Frequency"
+        "name": "Frequency",
+        "state_attributes": {
+          "description": {
+            "name": "Description"
+          }
+        }
       },
       "temperature": {
-        "name": "Temperature"
+        "name": "Temperature",
+        "state_attributes": {
+          "description": {
+            "name": "Description"
+          }
+        }
       },
       "rssi": {
-        "name": "Signal strength"
+        "name": "Signal strength",
+        "state_attributes": {
+          "description": {
+            "name": "Description"
+          }
+        }
       }
     },
     "button": {

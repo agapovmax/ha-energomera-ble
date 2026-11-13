@@ -22,6 +22,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from . import EnergomeraConfigEntry
+from .descriptions import describe
 from .entity import EnergomeraEntity
 
 # Названия объектов — в translations/*.json (entity.sensor.<key>.name).
@@ -105,6 +106,13 @@ async def async_setup_entry(
 
 class EnergomeraSensor(EnergomeraEntity, SensorEntity):
     entity_description: SensorEntityDescription
+    # пояснение не меняется — не засоряем им историю
+    _unrecorded_attributes = frozenset({"description"})
+
+    async def async_added_to_hass(self) -> None:
+        await super().async_added_to_hass()
+        if text := describe(self.entity_description.key, self.hass.config.language):
+            self._attr_extra_state_attributes = {"description": text}
 
     @property
     def native_value(self):

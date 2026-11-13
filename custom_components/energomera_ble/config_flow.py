@@ -11,11 +11,13 @@ from bleak.exc import BleakError
 from homeassistant.components import bluetooth
 from homeassistant.config_entries import ConfigEntry, ConfigFlow, ConfigFlowResult, OptionsFlow
 from homeassistant.const import CONF_ADDRESS, CONF_SCAN_INTERVAL
-from homeassistant.core import callback
+from homeassistant.core import HomeAssistant, callback
 
 from .const import (
+    CONF_DISCOVER_OTHERS,
     CONF_PIN,
     CONF_SERIAL,
+    DEFAULT_DISCOVER_OTHERS,
     DEFAULT_SCAN_INTERVAL,
     DOMAIN,
     MAX_SCAN_INTERVAL,
@@ -38,6 +40,20 @@ def _is_meter(info: bluetooth.BluetoothServiceInfoBleak) -> bool:
 def _serial_from_name(name: str) -> str:
     # "CE308 #012345678    " -> "012345678"
     return name.split("#", 1)[-1].strip()
+
+
+@callback
+def async_discovery_enabled(hass: HomeAssistant) -> bool:
+    """Показывать ли найденные счётчики.
+
+    Пока не добавлено ни одного счётчика — да (так проще начать).
+    Потом — только если хотя бы в одном счётчике включён параметр «Искать другие счётчики»:
+    на столбе обычно висят счётчики соседей, и без этого они все всплывают как «Обнаружено».
+    """
+    entries = hass.config_entries.async_entries(DOMAIN, include_ignore=False)
+    if not entries:
+        return True
+    return any(e.options.get(CONF_DISCOVER_OTHERS, DEFAULT_DISCOVER_OTHERS) for e in entries)
 
 
 def _title(name: str) -> str:
@@ -104,6 +120,8 @@ class EnergomeraConfigFlow(ConfigFlow, domain=DOMAIN):
         self._abort_if_unique_id_configured()
         if not _is_meter(discovery_info):
             return self.async_abort(reason="not_supported")
+        if not async_discovery_enabled(self.hass):
+            return self.async_abort(reason="discovery_disabled")
         self._discovery_info = discovery_info
         self.context["title_placeholders"] = {"name": _title(discovery_info.name)}
         return await self.async_step_bluetooth_confirm()
@@ -215,14 +233,21 @@ class EnergomeraOptionsFlow(OptionsFlow):
     async def async_step_init(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
         if user_input is not None:
             return self.async_create_entry(data=user_input)
-        current = self.config_entry.options.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL)
+        options = self.config_entry.options
         return self.async_show_form(
             step_id="init",
             data_schema=vol.Schema(
                 {
-                    vol.Required(CONF_SCAN_INTERVAL, default=current): vol.All(
+                    vol.Required(
+                        CONF_SCAN_INTERVAL,
+                        default=options.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL),
+                    ): vol.All(
                         vol.Coerce(int), vol.Range(min=MIN_SCAN_INTERVAL, max=MAX_SCAN_INTERVAL)
-                    )
+                    ),
+                    vol.Required(
+                        CONF_DISCOVER_OTHERS,
+                        default=options.get(CONF_DISCOVER_OTHERS, DEFAULT_DISCOVER_OTHERS),
+                    ): bool,
                 }
             ),
         )

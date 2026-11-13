@@ -4,6 +4,9 @@ DOMAIN = "energomera_ble"
 
 CONF_PIN = "pin"
 CONF_SERIAL = "serial"
+# Предлагать добавить другие найденные счётчики (например, соседей на том же столбе)
+CONF_DISCOVER_OTHERS = "discover_others"
+DEFAULT_DISCOVER_OTHERS = False
 
 DEFAULT_SCAN_INTERVAL = 120  # секунд
 MIN_SCAN_INTERVAL = 30

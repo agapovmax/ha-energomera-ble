@@ -43,7 +43,8 @@
       "already_in_progress": "Настройка этого счётчика уже идёт.",
       "not_supported": "Устройство не поддерживается.",
       "reauth_successful": "PIN обновлён, счётчик снова опрашивается.",
-      "reconfigure_successful": "PIN изменён."
+      "reconfigure_successful": "PIN изменён.",
+      "discovery_disabled": "Поиск других счётчиков выключен в параметрах интеграции."
     }
   },
   "options": {
@@ -51,7 +52,12 @@
       "init": {
         "title": "Параметры опроса",
         "data": {
-          "scan_interval": "Интервал опроса, сек"
+          "scan_interval": "Интервал опроса, сек",
+          "discover_others": "Предлагать добавить другие найденные счётчики"
+        },
+        "data_description": {
+          "scan_interval": "Как часто читать показания. Слишком частый опрос при слабом сигнале даёт больше ошибок.",
+          "discover_others": "Выключено — Home Assistant не будет показывать «Обнаружено» для чужих счётчиков поблизости (например, соседей на том же столбе). Добавить ещё один свой счётчик всегда можно вручную через «Добавить запись»."
         }
       }
     }
@@ -59,79 +65,204 @@
   "entity": {
     "sensor": {
       "energy_total": {
-        "name": "Энергия (сумма)"
+        "name": "Энергия (сумма)",
+        "state_attributes": {
+          "description": {
+            "name": "Описание"
+          }
+        }
       },
       "energy_t1": {
-        "name": "Энергия T1"
+        "name": "Энергия T1",
+        "state_attributes": {
+          "description": {
+            "name": "Описание"
+          }
+        }
       },
       "energy_t2": {
-        "name": "Энергия T2"
+        "name": "Энергия T2",
+        "state_attributes": {
+          "description": {
+            "name": "Описание"
+          }
+        }
       },
       "energy_t3": {
-        "name": "Энергия T3"
+        "name": "Энергия T3",
+        "state_attributes": {
+          "description": {
+            "name": "Описание"
+          }
+        }
       },
       "energy_t4": {
-        "name": "Энергия T4"
+        "name": "Энергия T4",
+        "state_attributes": {
+          "description": {
+            "name": "Описание"
+          }
+        }
       },
       "energy_l1": {
-        "name": "Энергия L1"
+        "name": "Энергия L1",
+        "state_attributes": {
+          "description": {
+            "name": "Описание"
+          }
+        }
       },
       "energy_l2": {
-        "name": "Энергия L2"
+        "name": "Энергия L2",
+        "state_attributes": {
+          "description": {
+            "name": "Описание"
+          }
+        }
       },
       "energy_l3": {
-        "name": "Энергия L3"
+        "name": "Энергия L3",
+        "state_attributes": {
+          "description": {
+            "name": "Описание"
+          }
+        }
       },
       "energy_today": {
-        "name": "Энергия за сегодня"
+        "name": "Энергия за сегодня",
+        "state_attributes": {
+          "description": {
+            "name": "Описание"
+          }
+        }
       },
       "energy_today_t1": {
-        "name": "Энергия за сегодня T1"
+        "name": "Энергия за сегодня T1",
+        "state_attributes": {
+          "description": {
+            "name": "Описание"
+          }
+        }
       },
       "energy_today_t2": {
-        "name": "Энергия за сегодня T2"
+        "name": "Энергия за сегодня T2",
+        "state_attributes": {
+          "description": {
+            "name": "Описание"
+          }
+        }
       },
       "power_total": {
-        "name": "Мощность"
+        "name": "Мощность",
+        "state_attributes": {
+          "description": {
+            "name": "Описание"
+          }
+        }
       },
       "power_l1": {
-        "name": "Мощность L1"
+        "name": "Мощность L1",
+        "state_attributes": {
+          "description": {
+            "name": "Описание"
+          }
+        }
       },
       "power_l2": {
-        "name": "Мощность L2"
+        "name": "Мощность L2",
+        "state_attributes": {
+          "description": {
+            "name": "Описание"
+          }
+        }
       },
       "power_l3": {
-        "name": "Мощность L3"
+        "name": "Мощность L3",
+        "state_attributes": {
+          "description": {
+            "name": "Описание"
+          }
+        }
       },
       "voltage_l1": {
-        "name": "Напряжение L1"
+        "name": "Напряжение L1",
+        "state_attributes": {
+          "description": {
+            "name": "Описание"
+          }
+        }
       },
       "voltage_l2": {
-        "name": "Напряжение L2"
+        "name": "Напряжение L2",
+        "state_attributes": {
+          "description": {
+            "name": "Описание"
+          }
+        }
       },
       "voltage_l3": {
-        "name": "Напряжение L3"
+        "name": "Напряжение L3",
+        "state_attributes": {
+          "description": {
+            "name": "Описание"
+          }
+        }
       },
       "current_l1": {
-        "name": "Ток L1"
+        "name": "Ток L1",
+        "state_attributes": {
+          "description": {
+            "name": "Описание"
+          }
+        }
       },
       "current_l2": {
-        "name": "Ток L2"
+        "name": "Ток L2",
+        "state_attributes": {
+          "description": {
+            "name": "Описание"
+          }
+        }
       },
       "current_l3": {
-        "name": "Ток L3"
+        "name": "Ток L3",
+        "state_attributes": {
+          "description": {
+            "name": "Описание"
+          }
+        }
       },
       "cos_total": {
-        "name": "cos φ"
+        "name": "cos φ",
+        "state_attributes": {
+          "description": {
+            "name": "Описание"
+          }
+        }
       },
       "frequency": {
-        "name": "Частота"
+        "name": "Частота",
+        "state_attributes": {
+          "description": {
+            "name": "Описание"
+          }
+        }
       },
       "temperature": {
-        "name": "Температура"
+        "name": "Температура",
+        "state_attributes": {
+          "description": {
+            "name": "Описание"
+          }
+        }
       },
       "rssi": {
-        "name": "Уровень сигнала"
+        "name": "Уровень сигнала",
+        "state_attributes": {
+          "description": {
+            "name": "Описание"
+          }
+        }
       }
     },
     "button": {
