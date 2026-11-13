@@ -1,6 +1,7 @@
 {
   "domain": "energomera_ble",
   "name": "Энергомера BLE (CE208/CE308)",
+  "categories": ["energy.meters_monitoring"],
   "codeowners": ["@agapovmax"],
   "config_flow": true,
   "dependencies": ["bluetooth_adapters"],
