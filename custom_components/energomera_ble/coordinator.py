@@ -11,11 +11,12 @@ from homeassistant.components import bluetooth
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_ADDRESS, CONF_SCAN_INTERVAL
 from homeassistant.core import HomeAssistant
+from homeassistant.exceptions import ConfigEntryAuthFailed
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
 from .const import CONF_PIN, DEFAULT_SCAN_INTERVAL, DOMAIN, STALE_DATA_TOLERANCE
 from .meter import MeterData, async_read_meter
-from .pairing import PairingError
+from .pairing import InvalidPin, PairingError, async_unpair
 from .protocol import MeterProtocolError
 
 _LOGGER = logging.getLogger(__name__)
@@ -40,17 +41,26 @@ class EnergomeraCoordinator(DataUpdateCoordinator[MeterData]):
         self.serial: str | None = None
         self.rssi: int | None = None
         self._last_success = 0.0
+        self.last_error: str | None = None
 
     async def _async_update_data(self) -> MeterData:
         ble_device = bluetooth.async_ble_device_from_address(self.hass, self.address, connectable=True)
         if ble_device is None:
-            return self._fail(f"Счётчик {self.address} сейчас не виден по Bluetooth")
+            return self._fail("Счётчик сейчас не виден по Bluetooth")
 
         info = bluetooth.async_last_service_info(self.hass, self.address, connectable=True)
         self.rssi = info.rssi if info else None
 
         try:
             data = await async_read_meter(ble_device, self.pin, want_serial=self.serial is None)
+        except InvalidPin as err:
+            # PIN сменили на счётчике: сбрасываем неверное сопряжение и просим новый PIN
+            self.last_error = f"PIN отвергнут: {err}"
+            try:
+                await async_unpair(self.address)
+            except Exception as unpair_err:  # noqa: BLE001 — D-Bus может быть недоступен
+                _LOGGER.debug("Не удалось удалить сопряжение: %s", unpair_err)
+            raise ConfigEntryAuthFailed("Счётчик отверг PIN") from err
         except PairingError as err:
             return self._fail(f"Ошибка сопряжения: {err}")
         except (BleakError, MeterProtocolError, TimeoutError, OSError) as err:
@@ -61,9 +71,11 @@ class EnergomeraCoordinator(DataUpdateCoordinator[MeterData]):
         if self.rssi is not None:
             data.values["rssi"] = self.rssi
         self._last_success = time.monotonic()
+        self.last_error = None
         return data
 
     def _fail(self, message: str) -> MeterData:
+        self.last_error = message
         # слабый сигнал на столбе — не дёргаем доступность из-за единичных сбоев
         if self.data is not None and time.monotonic() - self._last_success < STALE_DATA_TOLERANCE:
             _LOGGER.warning("%s — оставляю предыдущие показания", message)

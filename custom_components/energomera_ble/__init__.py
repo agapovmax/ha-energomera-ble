@@ -8,7 +8,7 @@ from homeassistant.core import HomeAssistant
 
 from .coordinator import EnergomeraCoordinator
 
-PLATFORMS = [Platform.SENSOR]
+PLATFORMS = [Platform.BUTTON, Platform.SENSOR]
 
 type EnergomeraConfigEntry = ConfigEntry[EnergomeraCoordinator]
 

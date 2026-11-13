@@ -1,10 +1,35 @@
 {
   "config": {
+    "flow_title": "{name}",
     "step": {
       "user": {
         "title": "Счётчик Энергомера (BLE)",
         "description": "Выберите свой счётчик по серийному номеру (он на корпусе и в формуляре) и введите PIN — «BLE-пароль радиоинтерфейса» из формуляра (6 цифр). Его также показывает индикаторное устройство CE901.",
-        "data": {"address": "Счётчик", "pin": "PIN (BLE-пароль)"}
+        "data": {
+          "address": "Счётчик",
+          "pin": "PIN (BLE-пароль)"
+        }
+      },
+      "bluetooth_confirm": {
+        "title": "Найден счётчик {name}",
+        "description": "Введите PIN — «BLE-пароль радиоинтерфейса» из формуляра счётчика (6 цифр). Его также показывает индикаторное устройство CE901.",
+        "data": {
+          "pin": "PIN (BLE-пароль)"
+        }
+      },
+      "reauth_confirm": {
+        "title": "Счётчик отверг PIN",
+        "description": "Счётчик {name} больше не принимает сохранённый PIN — вероятно, BLE-пароль был изменён. Введите действующий PIN.",
+        "data": {
+          "pin": "PIN (BLE-пароль)"
+        }
+      },
+      "reconfigure": {
+        "title": "Смена PIN",
+        "description": "Новый PIN для счётчика {name}. Сопряжение будет выполнено заново.",
+        "data": {
+          "pin": "PIN (BLE-пароль)"
+        }
       }
     },
     "error": {
@@ -14,14 +39,104 @@
     },
     "abort": {
       "no_devices_found": "Счётчики CE208/CE308 не найдены в Bluetooth-эфире.",
-      "already_configured": "Этот счётчик уже добавлен."
+      "already_configured": "Этот счётчик уже добавлен.",
+      "already_in_progress": "Настройка этого счётчика уже идёт.",
+      "not_supported": "Устройство не поддерживается.",
+      "reauth_successful": "PIN обновлён, счётчик снова опрашивается.",
+      "reconfigure_successful": "PIN изменён."
     }
   },
   "options": {
     "step": {
       "init": {
         "title": "Параметры опроса",
-        "data": {"scan_interval": "Интервал опроса, сек"}
+        "data": {
+          "scan_interval": "Интервал опроса, сек"
+        }
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "energy_total": {
+        "name": "Энергия (сумма)"
+      },
+      "energy_t1": {
+        "name": "Энергия T1"
+      },
+      "energy_t2": {
+        "name": "Энергия T2"
+      },
+      "energy_t3": {
+        "name": "Энергия T3"
+      },
+      "energy_t4": {
+        "name": "Энергия T4"
+      },
+      "energy_l1": {
+        "name": "Энергия L1"
+      },
+      "energy_l2": {
+        "name": "Энергия L2"
+      },
+      "energy_l3": {
+        "name": "Энергия L3"
+      },
+      "energy_today": {
+        "name": "Энергия за сегодня"
+      },
+      "energy_today_t1": {
+        "name": "Энергия за сегодня T1"
+      },
+      "energy_today_t2": {
+        "name": "Энергия за сегодня T2"
+      },
+      "power_total": {
+        "name": "Мощность"
+      },
+      "power_l1": {
+        "name": "Мощность L1"
+      },
+      "power_l2": {
+        "name": "Мощность L2"
+      },
+      "power_l3": {
+        "name": "Мощность L3"
+      },
+      "voltage_l1": {
+        "name": "Напряжение L1"
+      },
+      "voltage_l2": {
+        "name": "Напряжение L2"
+      },
+      "voltage_l3": {
+        "name": "Напряжение L3"
+      },
+      "current_l1": {
+        "name": "Ток L1"
+      },
+      "current_l2": {
+        "name": "Ток L2"
+      },
+      "current_l3": {
+        "name": "Ток L3"
+      },
+      "cos_total": {
+        "name": "cos φ"
+      },
+      "frequency": {
+        "name": "Частота"
+      },
+      "temperature": {
+        "name": "Температура"
+      },
+      "rssi": {
+        "name": "Уровень сигнала"
+      }
+    },
+    "button": {
+      "refresh": {
+        "name": "Опросить сейчас"
       }
     }
   }

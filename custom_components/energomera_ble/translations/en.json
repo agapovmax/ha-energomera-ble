@@ -1,10 +1,35 @@
 {
   "config": {
+    "flow_title": "{name}",
     "step": {
       "user": {
         "title": "Energomera meter (BLE)",
         "description": "Select your meter by its serial number (printed on the case and in the meter's passport) and enter the PIN — the 6-digit \"BLE radio interface password\" from the passport. The CE901 display unit shows it as well.",
-        "data": {"address": "Meter", "pin": "PIN (BLE password)"}
+        "data": {
+          "address": "Meter",
+          "pin": "PIN (BLE password)"
+        }
+      },
+      "bluetooth_confirm": {
+        "title": "Found meter {name}",
+        "description": "Enter the PIN — the 6-digit \"BLE radio interface password\" from the meter's passport. The CE901 display unit shows it as well.",
+        "data": {
+          "pin": "PIN (BLE password)"
+        }
+      },
+      "reauth_confirm": {
+        "title": "The meter rejected the PIN",
+        "description": "Meter {name} no longer accepts the stored PIN — the BLE password was probably changed. Enter the current PIN.",
+        "data": {
+          "pin": "PIN (BLE password)"
+        }
+      },
+      "reconfigure": {
+        "title": "Change PIN",
+        "description": "New PIN for meter {name}. The meter will be paired again.",
+        "data": {
+          "pin": "PIN (BLE password)"
+        }
       }
     },
     "error": {
@@ -14,14 +39,104 @@
     },
     "abort": {
       "no_devices_found": "No CE208/CE308 meters found over Bluetooth.",
-      "already_configured": "This meter is already configured."
+      "already_configured": "This meter is already configured.",
+      "already_in_progress": "This meter is already being set up.",
+      "not_supported": "This device is not supported.",
+      "reauth_successful": "PIN updated, the meter is being polled again.",
+      "reconfigure_successful": "PIN changed."
     }
   },
   "options": {
     "step": {
       "init": {
         "title": "Polling options",
-        "data": {"scan_interval": "Polling interval, seconds"}
+        "data": {
+          "scan_interval": "Polling interval, seconds"
+        }
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "energy_total": {
+        "name": "Energy total"
+      },
+      "energy_t1": {
+        "name": "Energy T1"
+      },
+      "energy_t2": {
+        "name": "Energy T2"
+      },
+      "energy_t3": {
+        "name": "Energy T3"
+      },
+      "energy_t4": {
+        "name": "Energy T4"
+      },
+      "energy_l1": {
+        "name": "Energy L1"
+      },
+      "energy_l2": {
+        "name": "Energy L2"
+      },
+      "energy_l3": {
+        "name": "Energy L3"
+      },
+      "energy_today": {
+        "name": "Energy today"
+      },
+      "energy_today_t1": {
+        "name": "Energy today T1"
+      },
+      "energy_today_t2": {
+        "name": "Energy today T2"
+      },
+      "power_total": {
+        "name": "Power"
+      },
+      "power_l1": {
+        "name": "Power L1"
+      },
+      "power_l2": {
+        "name": "Power L2"
+      },
+      "power_l3": {
+        "name": "Power L3"
+      },
+      "voltage_l1": {
+        "name": "Voltage L1"
+      },
+      "voltage_l2": {
+        "name": "Voltage L2"
+      },
+      "voltage_l3": {
+        "name": "Voltage L3"
+      },
+      "current_l1": {
+        "name": "Current L1"
+      },
+      "current_l2": {
+        "name": "Current L2"
+      },
+      "current_l3": {
+        "name": "Current L3"
+      },
+      "cos_total": {
+        "name": "Power factor"
+      },
+      "frequency": {
+        "name": "Frequency"
+      },
+      "temperature": {
+        "name": "Temperature"
+      },
+      "rssi": {
+        "name": "Signal strength"
+      }
+    },
+    "button": {
+      "refresh": {
+        "name": "Poll now"
       }
     }
   }

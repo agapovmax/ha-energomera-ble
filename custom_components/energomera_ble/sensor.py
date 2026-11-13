@@ -18,32 +18,33 @@ from homeassistant.const import (
     UnitOfPower,
     UnitOfTemperature,
 )
-from homeassistant.core import HomeAssistant, callback
-from homeassistant.helpers.device_registry import CONNECTION_BLUETOOTH, DeviceInfo
+from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
-from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from . import EnergomeraConfigEntry
-from .const import DOMAIN, MANUFACTURER
-from .coordinator import EnergomeraCoordinator
+from .entity import EnergomeraEntity
+
+# Названия объектов — в translations/*.json (entity.sensor.<key>.name).
 
 
-def _energy(key: str, name: str, enabled: bool = True) -> SensorEntityDescription:
+def _energy(
+    key: str, enabled: bool = True, state_class: SensorStateClass = SensorStateClass.TOTAL_INCREASING
+) -> SensorEntityDescription:
     return SensorEntityDescription(
         key=key,
-        name=name,
+        translation_key=key,
         native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
         device_class=SensorDeviceClass.ENERGY,
-        state_class=SensorStateClass.TOTAL_INCREASING,
+        state_class=state_class,
         suggested_display_precision=2,
         entity_registry_enabled_default=enabled,
     )
 
 
-def _phase(key: str, name: str, unit: str, dc: SensorDeviceClass, prec: int) -> SensorEntityDescription:
+def _measure(key: str, unit: str | None, dc: SensorDeviceClass, prec: int) -> SensorEntityDescription:
     return SensorEntityDescription(
         key=key,
-        name=name,
+        translation_key=key,
         native_unit_of_measurement=unit,
         device_class=dc,
         state_class=SensorStateClass.MEASUREMENT,
@@ -51,44 +52,33 @@ def _phase(key: str, name: str, unit: str, dc: SensorDeviceClass, prec: int) -> 
     )
 
 
+PHASES = (1, 2, 3)
+
 SENSORS: tuple[SensorEntityDescription, ...] = (
-    _energy("energy_total", "Энергия (сумма)"),
-    _energy("energy_t1", "Энергия T1"),
-    _energy("energy_t2", "Энергия T2"),
-    _energy("energy_t3", "Энергия T3", enabled=False),
-    _energy("energy_t4", "Энергия T4", enabled=False),
-    *(_energy(f"energy_l{i}", f"Энергия L{i}", enabled=False) for i in (1, 2, 3)),
+    _energy("energy_total"),
+    _energy("energy_t1"),
+    _energy("energy_t2"),
+    _energy("energy_t3", enabled=False),
+    _energy("energy_t4", enabled=False),
+    *(_energy(f"energy_l{i}", enabled=False) for i in PHASES),
+    _energy("energy_today", state_class=SensorStateClass.TOTAL),
+    _energy("energy_today_t1", enabled=False, state_class=SensorStateClass.TOTAL),
+    _energy("energy_today_t2", enabled=False, state_class=SensorStateClass.TOTAL),
+    _measure("power_total", UnitOfPower.KILO_WATT, SensorDeviceClass.POWER, 3),
+    *(_measure(f"power_l{i}", UnitOfPower.KILO_WATT, SensorDeviceClass.POWER, 3) for i in PHASES),
     *(
-        SensorEntityDescription(
-            key=key,
-            name=name,
-            native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
-            device_class=SensorDeviceClass.ENERGY,
-            state_class=SensorStateClass.TOTAL,
-            suggested_display_precision=2,
-            entity_registry_enabled_default=enabled,
-        )
-        for key, name, enabled in (
-            ("energy_today", "Энергия за сегодня", True),
-            ("energy_today_t1", "Энергия за сегодня T1", False),
-            ("energy_today_t2", "Энергия за сегодня T2", False),
-        )
-    ),
-    _phase("power_total", "Мощность", UnitOfPower.KILO_WATT, SensorDeviceClass.POWER, 3),
-    *(_phase(f"power_l{i}", f"Мощность L{i}", UnitOfPower.KILO_WATT, SensorDeviceClass.POWER, 3) for i in (1, 2, 3)),
-    *(
-        _phase(f"voltage_l{i}", f"Напряжение L{i}", UnitOfElectricPotential.VOLT, SensorDeviceClass.VOLTAGE, 1)
-        for i in (1, 2, 3)
+        _measure(f"voltage_l{i}", UnitOfElectricPotential.VOLT, SensorDeviceClass.VOLTAGE, 1)
+        for i in PHASES
     ),
     *(
-        _phase(f"current_l{i}", f"Ток L{i}", UnitOfElectricCurrent.AMPERE, SensorDeviceClass.CURRENT, 2)
-        for i in (1, 2, 3)
+        _measure(f"current_l{i}", UnitOfElectricCurrent.AMPERE, SensorDeviceClass.CURRENT, 2)
+        for i in PHASES
     ),
-    _phase("cos_total", "cos φ", None, SensorDeviceClass.POWER_FACTOR, 2),
-    _phase("frequency", "Частота", UnitOfFrequency.HERTZ, SensorDeviceClass.FREQUENCY, 2),
+    _measure("cos_total", None, SensorDeviceClass.POWER_FACTOR, 2),
+    _measure("frequency", UnitOfFrequency.HERTZ, SensorDeviceClass.FREQUENCY, 2),
     SensorEntityDescription(
         key="temperature",
-        name="Температура",
+        translation_key="temperature",
         native_unit_of_measurement=UnitOfTemperature.CELSIUS,
         device_class=SensorDeviceClass.TEMPERATURE,
         state_class=SensorStateClass.MEASUREMENT,
@@ -96,7 +86,7 @@ SENSORS: tuple[SensorEntityDescription, ...] = (
     ),
     SensorEntityDescription(
         key="rssi",
-        name="Уровень сигнала",
+        translation_key="rssi",
         native_unit_of_measurement=SIGNAL_STRENGTH_DECIBELS_MILLIWATT,
         device_class=SensorDeviceClass.SIGNAL_STRENGTH,
         state_class=SensorStateClass.MEASUREMENT,
@@ -113,23 +103,8 @@ async def async_setup_entry(
     async_add_entities(EnergomeraSensor(coordinator, d) for d in SENSORS if d.key in present)
 
 
-class EnergomeraSensor(CoordinatorEntity[EnergomeraCoordinator], SensorEntity):
-    _attr_has_entity_name = True
-
-    def __init__(self, coordinator: EnergomeraCoordinator, description: SensorEntityDescription) -> None:
-        super().__init__(coordinator)
-        self.entity_description = description
-        address = coordinator.address
-        self._attr_unique_id = f"{address}_{description.key}"
-        title = coordinator.config_entry.title
-        self._attr_device_info = DeviceInfo(
-            identifiers={(DOMAIN, address)},
-            connections={(CONNECTION_BLUETOOTH, address)},
-            manufacturer=MANUFACTURER,
-            model=title.split(" ")[0] if title else "CE308",
-            name=title,
-            serial_number=coordinator.serial,
-        )
+class EnergomeraSensor(EnergomeraEntity, SensorEntity):
+    entity_description: SensorEntityDescription
 
     @property
     def native_value(self):

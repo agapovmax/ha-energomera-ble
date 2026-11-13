@@ -6,6 +6,7 @@
 
 [![HACS Custom](https://img.shields.io/badge/HACS-Custom-41BDF5.svg)](https://hacs.xyz/docs/faq/custom_repositories)
 [![Validate](https://github.com/agapovmax/ha-energomera-ble/actions/workflows/validate.yml/badge.svg)](https://github.com/agapovmax/ha-energomera-ble/actions/workflows/validate.yml)
+[![Tests](https://github.com/agapovmax/ha-energomera-ble/actions/workflows/tests.yml/badge.svg)](https://github.com/agapovmax/ha-energomera-ble/actions/workflows/tests.yml)
 
 Пользовательская интеграция Home Assistant для чтения показаний электросчётчиков
 **Энергомера CE208 / CE308** со встроенным Bluetooth LE-модулем — напрямую,
@@ -15,12 +16,18 @@
 
 ## Возможности
 
-- Поиск счётчиков в эфире и настройка через интерфейс (мастер с выбором по серийному номеру).
+- **Автообнаружение**: Home Assistant сам сообщает о найденном счётчике — остаётся ввести PIN.
+- Ручное добавление через мастер с выбором счётчика по серийному номеру.
 - Автоматическое сопряжение (bonding) по PIN — «BLE-паролю радиоинтерфейса» из формуляра.
 - Показания по протоколу МЭК 61107 (ГОСТ Р МЭК 61107) поверх BLE.
 - Устойчивость к слабому сигналу: при единичных сбоях сохраняются последние показания
   (до 15 минут), объекты не «мигают» недоступностью.
 - Совместимость с панелью «Энергия» Home Assistant.
+- Кнопка **«Опросить сейчас»** для внеочередного чтения показаний.
+- **Смена PIN без удаления интеграции**: если счётчик отверг PIN, Home Assistant
+  попросит ввести новый; PIN можно сменить и вручную через «Перенастроить».
+- **Диагностика** для сообщений об ошибках (PIN, адрес и серийный номер скрыты).
+- Названия сенсоров переводятся на язык интерфейса (русский, английский).
 
 ## Сенсоры
 
@@ -30,7 +37,7 @@
 | Энергия за сегодня | сумма (T1, T2 — выключены по умолчанию) |
 | Мощность | общая, L1–L3, кВт |
 | Сеть | напряжение L1–L3, ток L1–L3, cos φ, частота |
-| Диагностика | температура счётчика, уровень сигнала (RSSI) |
+| Диагностика | температура счётчика, уровень сигнала (RSSI), кнопка «Опросить сейчас» |
 
 Создаются только те сенсоры, которые реально вернул счётчик (у однофазного CE208 фаз L2/L3 не будет).
 
@@ -59,15 +66,26 @@
 
 ## Настройка
 
+Обычно счётчик находится автоматически: в **Настройки → Устройства и службы**
+появится карточка «Обнаружено: CE308 №…» — нажмите **Добавить** и введите PIN.
+
+Если карточки нет:
+
 1. **Настройки → Устройства и службы → Добавить интеграцию → «Энергомера BLE»**.
 2. Выберите счётчик по серийному номеру и введите PIN.
-3. Интервал опроса (по умолчанию 120 с, от 30 до 3600 с) меняется в параметрах интеграции.
+
+Интервал опроса (по умолчанию 120 с, от 30 до 3600 с) меняется в параметрах интеграции,
+PIN — через ⋮ → **Перенастроить**.
 
 ## Решение проблем
 
 - **«Счётчики не найдены»** — счётчик слишком далеко или его уже занял другой клиент
   (например, мобильное приложение). Поднесите адаптер ближе / используйте USB-удлинитель.
 - **«Счётчик отверг PIN»** — проверьте BLE-пароль; неверное сопряжение удаляется автоматически.
+  Если PIN сменили уже после настройки, Home Assistant покажет «Требуется повторная
+  аутентификация» — введите новый PIN.
+- **Сообщение об ошибке** — приложите файл диагностики: страница устройства → ⋮ →
+  **Скачать диагностику**. Личные данные в нём скрыты.
 - Для подробного журнала:
 
   ```yaml
@@ -75,6 +93,15 @@
     logs:
       custom_components.energomera_ble: debug
   ```
+
+## Разработка
+
+Разбор протокола (`protocol.py`) не зависит от Home Assistant и покрыт тестами:
+
+```bash
+pip install pytest
+pytest tests
+```
 
 ## Благодарности
 
@@ -92,7 +119,9 @@ IEC 61107 frames — no ESPHome or cloud needed.
 
 Install via HACS as a custom repository (`Integration` type) or copy
 `custom_components/energomera_ble` into your config folder, restart, then add
-**Energomera BLE** in *Settings → Devices & services*. You will need the 6-digit
+**Energomera BLE** in *Settings → Devices & services* (meters are usually
+discovered automatically). Includes a *Poll now* button, re-authentication when
+the PIN changes, a reconfigure flow and downloadable diagnostics. You will need the 6-digit
 BLE PIN from the meter's passport and a **local** Bluetooth adapter (pairing goes
 through BlueZ, so ESPHome Bluetooth proxies are not supported for pairing).
 
