@@ -42,6 +42,49 @@ _EN: dict[str, str] = {
     "below −90 dBm the link is unreliable.",
 }
 
+_RU.update(
+    {
+        "neutral_current": "Расчётный ток в нулевом проводе: чем сильнее перекос, тем он больше. Считается по токам "
+        "фаз в предположении одинакового cos φ, поэтому приблизительный. Если он близок к току самой загруженной "
+        "фазы — нагрузка сильно перекошена.",
+        "current_spread": "Разница токов самой загруженной и самой свободной фазы. Чем меньше, тем равномернее "
+        "распределена нагрузка.",
+        "current_imbalance": "Наибольшее отклонение тока фазы от среднего по трём фазам, в % от среднего. "
+        "При очень малой нагрузке (средний ток меньше 0,5 А) не считается.",
+        "power_spread": "Разница мощностей самой загруженной и самой свободной фазы.",
+        "max_load_phase": "Фаза с наибольшим током сейчас. Новую мощную нагрузку лучше не подключать на неё.",
+        "min_load_phase": "Фаза с наименьшим током сейчас. Новую мощную нагрузку лучше подключать на неё.",
+        "phase_imbalance": "Включается, когда разница токов между фазами не меньше порога из параметров интеграции "
+        "(по умолчанию 10 А) два опроса подряд; выключается так же. Короткие включения чайника или "
+        "микроволновки не учитываются.",
+        "neutral_break": "Включается, если напряжение одной фазы выше 250 В, а другой одновременно ниже 200 В — "
+        "типичная картина при обрыве (отгорании) нуля. Опасно для техники: проверьте щиток или вызовите "
+        "электрика. Защитить технику успевает только реле напряжения в щитке — опрос раз в несколько минут "
+        "для этого слишком медленный.",
+    }
+)
+_EN.update(
+    {
+        "neutral_current": "Estimated current in the neutral conductor: the larger the imbalance, the higher it is. "
+        "Computed from phase currents assuming equal power factors, so it is approximate. If it is close to the "
+        "current of the most loaded phase, the load is heavily unbalanced.",
+        "current_spread": "Current difference between the most and least loaded phase. Lower means the load is "
+        "spread more evenly.",
+        "current_imbalance": "Largest deviation of a phase current from the three-phase average, in % of the "
+        "average. Not computed at very low load (average below 0.5 A).",
+        "power_spread": "Power difference between the most and least loaded phase.",
+        "max_load_phase": "Phase with the highest current right now. Avoid adding heavy loads to it.",
+        "min_load_phase": "Phase with the lowest current right now. Prefer it for new heavy loads.",
+        "phase_imbalance": "Turns on when the current difference between phases is at least the threshold from the "
+        "integration options (10 A by default) for two polls in a row; turns off the same way. Short spikes "
+        "from a kettle or microwave are ignored.",
+        "neutral_break": "Turns on if one phase is above 250 V while another is below 200 V at the same time, the "
+        "typical picture of a broken neutral. Dangerous for appliances: check the panel or call an electrician. "
+        "Only a voltage relay in the panel reacts fast enough to protect appliances; polling every few "
+        "minutes is too slow for that.",
+    }
+)
+
 for _i in (1, 2, 3):
     _RU[f"energy_l{_i}"] = f"Энергия, учтённая по фазе L{_i} с начала эксплуатации."
     _EN[f"energy_l{_i}"] = f"Energy recorded on phase L{_i} since commissioning."

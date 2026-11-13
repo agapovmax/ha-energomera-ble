@@ -53,10 +53,12 @@
         "title": "Polling options",
         "data": {
           "scan_interval": "Polling interval, seconds",
+          "imbalance_threshold": "Phase imbalance threshold, A",
           "discover_others": "Offer to add other discovered meters"
         },
         "data_description": {
           "scan_interval": "How often to read the meter. Polling too often with a weak signal causes more errors.",
+          "imbalance_threshold": "\"Phase imbalance\" turns on when the current difference between the most and least loaded phase is at least this value for two polls in a row.",
           "discover_others": "When off, Home Assistant will not show \"Discovered\" cards for other meters nearby (e.g. neighbours on the same pole). You can always add another meter of your own manually with \"Add entry\"."
         }
       }
@@ -263,11 +265,87 @@
             "name": "Description"
           }
         }
+      },
+      "neutral_current": {
+        "name": "Neutral current (estimated)",
+        "state_attributes": {
+          "description": {
+            "name": "Description"
+          }
+        }
+      },
+      "current_spread": {
+        "name": "Phase current difference",
+        "state_attributes": {
+          "description": {
+            "name": "Description"
+          }
+        }
+      },
+      "current_imbalance": {
+        "name": "Current imbalance",
+        "state_attributes": {
+          "description": {
+            "name": "Description"
+          }
+        }
+      },
+      "power_spread": {
+        "name": "Phase power difference",
+        "state_attributes": {
+          "description": {
+            "name": "Description"
+          }
+        }
+      },
+      "max_load_phase": {
+        "name": "Most loaded phase",
+        "state_attributes": {
+          "description": {
+            "name": "Description"
+          }
+        },
+        "state": {
+          "l1": "L1",
+          "l2": "L2",
+          "l3": "L3"
+        }
+      },
+      "min_load_phase": {
+        "name": "Least loaded phase",
+        "state_attributes": {
+          "description": {
+            "name": "Description"
+          }
+        },
+        "state": {
+          "l1": "L1",
+          "l2": "L2",
+          "l3": "L3"
+        }
       }
     },
     "button": {
       "refresh": {
         "name": "Poll now"
+      }
+    },
+    "binary_sensor": {
+      "phase_imbalance": {
+        "name": "Phase imbalance",
+        "state_attributes": {
+          "description": {
+            "name": "Description"
+          }
+        }
+      },
+      "neutral_break": {
+        "name": "Suspected neutral break",
+        "state_attributes": {
+          "description": {
+            "name": "Description"
+          }
+        }
       }
     }
   }

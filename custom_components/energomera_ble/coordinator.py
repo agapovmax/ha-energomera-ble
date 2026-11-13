@@ -14,8 +14,15 @@ from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryAuthFailed
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
-from .const import CONF_PIN, DEFAULT_SCAN_INTERVAL, DOMAIN, STALE_DATA_TOLERANCE
+from .const import (
+    CONF_IMBALANCE_THRESHOLD,
+    CONF_PIN,
+    DEFAULT_SCAN_INTERVAL,
+    DOMAIN,
+    STALE_DATA_TOLERANCE,
+)
 from .meter import MeterData, async_read_meter
+from .phases import DEFAULT_IMBALANCE_THRESHOLD, Debounce, derive
 from .pairing import InvalidPin, PairingError, async_unpair
 from .protocol import MeterProtocolError
 
@@ -42,6 +49,10 @@ class EnergomeraCoordinator(DataUpdateCoordinator[MeterData]):
         self.rssi: int | None = None
         self._last_success = 0.0
         self.last_error: str | None = None
+        self.imbalance_threshold = float(
+            entry.options.get(CONF_IMBALANCE_THRESHOLD, DEFAULT_IMBALANCE_THRESHOLD)
+        )
+        self._imbalance = Debounce()
 
     async def _async_update_data(self) -> MeterData:
         ble_device = bluetooth.async_ble_device_from_address(self.hass, self.address, connectable=True)
@@ -70,6 +81,7 @@ class EnergomeraCoordinator(DataUpdateCoordinator[MeterData]):
             self.serial = data.serial
         if self.rssi is not None:
             data.values["rssi"] = self.rssi
+        data.values.update(derive(data.values, self.imbalance_threshold, self._imbalance))
         self._last_success = time.monotonic()
         self.last_error = None
         return data

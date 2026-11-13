@@ -7,11 +7,14 @@ from homeassistant.helpers.entity import EntityDescription
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from .const import DOMAIN, MANUFACTURER
+from .descriptions import describe
 from .coordinator import EnergomeraCoordinator
 
 
 class EnergomeraEntity(CoordinatorEntity[EnergomeraCoordinator]):
     _attr_has_entity_name = True
+    # пояснение не меняется — не засоряем им историю
+    _unrecorded_attributes = frozenset({"description"})
 
     def __init__(self, coordinator: EnergomeraCoordinator, description: EntityDescription) -> None:
         super().__init__(coordinator)
@@ -27,3 +30,8 @@ class EnergomeraEntity(CoordinatorEntity[EnergomeraCoordinator]):
             name=title,
             serial_number=coordinator.serial,
         )
+
+    async def async_added_to_hass(self) -> None:
+        await super().async_added_to_hass()
+        if text := describe(self.entity_description.key, self.hass.config.language):
+            self._attr_extra_state_attributes = {"description": text}

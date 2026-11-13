@@ -9,6 +9,7 @@ from homeassistant.components.sensor import (
     SensorStateClass,
 )
 from homeassistant.const import (
+    PERCENTAGE,
     SIGNAL_STRENGTH_DECIBELS_MILLIWATT,
     EntityCategory,
     UnitOfElectricCurrent,
@@ -22,7 +23,6 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from . import EnergomeraConfigEntry
-from .descriptions import describe
 from .entity import EnergomeraEntity
 
 # Названия объектов — в translations/*.json (entity.sensor.<key>.name).
@@ -76,6 +76,26 @@ SENSORS: tuple[SensorEntityDescription, ...] = (
         for i in PHASES
     ),
     _measure("cos_total", None, SensorDeviceClass.POWER_FACTOR, 2),
+    # --- расчётные по фазам (только трёхфазный счётчик) ---
+    _measure("neutral_current", UnitOfElectricCurrent.AMPERE, SensorDeviceClass.CURRENT, 2),
+    _measure("current_spread", UnitOfElectricCurrent.AMPERE, SensorDeviceClass.CURRENT, 2),
+    SensorEntityDescription(
+        key="current_imbalance",
+        translation_key="current_imbalance",
+        native_unit_of_measurement=PERCENTAGE,
+        state_class=SensorStateClass.MEASUREMENT,
+        suggested_display_precision=0,
+    ),
+    _measure("power_spread", UnitOfPower.KILO_WATT, SensorDeviceClass.POWER, 3),
+    *(
+        SensorEntityDescription(
+            key=key,
+            translation_key=key,
+            device_class=SensorDeviceClass.ENUM,
+            options=["l1", "l2", "l3"],
+        )
+        for key in ("max_load_phase", "min_load_phase")
+    ),
     _measure("frequency", UnitOfFrequency.HERTZ, SensorDeviceClass.FREQUENCY, 2),
     SensorEntityDescription(
         key="temperature",
@@ -106,13 +126,6 @@ async def async_setup_entry(
 
 class EnergomeraSensor(EnergomeraEntity, SensorEntity):
     entity_description: SensorEntityDescription
-    # пояснение не меняется — не засоряем им историю
-    _unrecorded_attributes = frozenset({"description"})
-
-    async def async_added_to_hass(self) -> None:
-        await super().async_added_to_hass()
-        if text := describe(self.entity_description.key, self.hass.config.language):
-            self._attr_extra_state_attributes = {"description": text}
 
     @property
     def native_value(self):

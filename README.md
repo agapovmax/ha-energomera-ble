@@ -41,9 +41,41 @@
 | Энергия за сегодня | сумма (T1, T2 — выключены по умолчанию) |
 | Мощность | общая, L1–L3, кВт |
 | Сеть | напряжение L1–L3, ток L1–L3, cos φ, частота |
+| Фазы (расчёт) | ток в нуле, перекос по току (А и %), перекос по мощности, самая загруженная и самая свободная фаза |
+| Тревоги | «Перекос фаз», «Подозрение на обрыв нуля» |
 | Диагностика | температура счётчика, уровень сигнала (RSSI), кнопка «Опросить сейчас» |
 
 Создаются только те сенсоры, которые реально вернул счётчик (у однофазного CE208 фаз L2/L3 не будет).
+
+## Перекос фаз и обрыв нуля
+
+Для трёхфазного CE308 интеграция считает по токам и напряжениям фаз:
+
+- **Ток в нуле (расчётный)** — сколько тока течёт по нулевому проводу из-за неравномерной нагрузки.
+  Приблизительно: считается в предположении одинакового cos φ на фазах.
+- **Перекос по току** (А и % от среднего) и **по мощности** (кВт).
+- **Самая загруженная / самая свободная фаза** — куда лучше подключать новую мощную нагрузку.
+- **Перекос фаз** (тревога) — разница токов не меньше порога (по умолчанию 10 А, меняется в
+  параметрах) два опроса подряд; короткие включения чайника не учитываются.
+- **Подозрение на обрыв нуля** (тревога) — одна фаза выше 250 В и одновременно другая ниже 200 В.
+  Пригодится для уведомлений, но технику не защитит: для этого нужно реле напряжения в щитке.
+
+Пример автоматизации-уведомления:
+
+```yaml
+automation:
+  - alias: "Обрыв нуля"
+    triggers:
+      - trigger: state
+        entity_id: binary_sensor.ce308_no012345678_podozrenie_na_obryv_nulia
+        to: "on"
+    actions:
+      - action: notify.notify
+        data:
+          message: "⚠️ Похоже на обрыв нуля: напряжения фаз сильно разошлись. Проверьте щиток!"
+```
+
+ID объекта посмотрите на странице устройства.
 
 ## Требования
 
@@ -81,6 +113,7 @@
 В **параметрах** интеграции (кнопка ⚙️ на странице интеграции):
 
 - **Интервал опроса** — по умолчанию 120 с, от 30 до 3600 с.
+- **Порог перекоса фаз** — по умолчанию 10 А.
 - **Предлагать добавить другие найденные счётчики** — по умолчанию выключено: после добавления
   своего счётчика Home Assistant не показывает «Обнаружено» для чужих. Включите, если у вас
   несколько счётчиков. Ненужный найденный счётчик можно также скрыть кнопкой **Игнорировать**.
@@ -130,7 +163,8 @@ IEC 61107 frames — no ESPHome or cloud needed.
 Install via HACS as a custom repository (`Integration` type) or copy
 `custom_components/energomera_ble` into your config folder, restart, then add
 **Energomera BLE** in *Settings → Devices & services* (meters are usually
-discovered automatically). Includes a *Poll now* button, re-authentication when
+discovered automatically). Three-phase meters also get neutral current, phase imbalance sensors and
+alarms for phase imbalance and a suspected broken neutral. Includes a *Poll now* button, re-authentication when
 the PIN changes, a reconfigure flow and downloadable diagnostics. You will need the 6-digit
 BLE PIN from the meter's passport and a **local** Bluetooth adapter (pairing goes
 through BlueZ, so ESPHome Bluetooth proxies are not supported for pairing).

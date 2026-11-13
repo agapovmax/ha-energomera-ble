@@ -7,6 +7,10 @@ CONF_SERIAL = "serial"
 # Предлагать добавить другие найденные счётчики (например, соседей на том же столбе)
 CONF_DISCOVER_OTHERS = "discover_others"
 DEFAULT_DISCOVER_OTHERS = False
+# Порог разницы токов между фазами для «Перекоса фаз», А
+CONF_IMBALANCE_THRESHOLD = "imbalance_threshold"
+MIN_IMBALANCE_THRESHOLD = 1
+MAX_IMBALANCE_THRESHOLD = 100
 
 DEFAULT_SCAN_INTERVAL = 120  # секунд
 MIN_SCAN_INTERVAL = 30

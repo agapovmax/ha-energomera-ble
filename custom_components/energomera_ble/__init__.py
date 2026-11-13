@@ -10,7 +10,7 @@ from .config_flow import async_discovery_enabled
 from .const import DOMAIN
 from .coordinator import EnergomeraCoordinator
 
-PLATFORMS = [Platform.BUTTON, Platform.SENSOR]
+PLATFORMS = [Platform.BINARY_SENSOR, Platform.BUTTON, Platform.SENSOR]
 
 type EnergomeraConfigEntry = ConfigEntry[EnergomeraCoordinator]
 

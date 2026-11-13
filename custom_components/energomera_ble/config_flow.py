@@ -15,16 +15,20 @@ from homeassistant.core import HomeAssistant, callback
 
 from .const import (
     CONF_DISCOVER_OTHERS,
+    CONF_IMBALANCE_THRESHOLD,
     CONF_PIN,
     CONF_SERIAL,
     DEFAULT_DISCOVER_OTHERS,
     DEFAULT_SCAN_INTERVAL,
     DOMAIN,
+    MAX_IMBALANCE_THRESHOLD,
     MAX_SCAN_INTERVAL,
+    MIN_IMBALANCE_THRESHOLD,
     MIN_SCAN_INTERVAL,
     NAME_PREFIXES,
 )
 from .meter import MeterData, async_read_meter
+from .phases import DEFAULT_IMBALANCE_THRESHOLD
 from .pairing import InvalidPin, PairingError, async_unpair
 from .protocol import MeterProtocolError
 
@@ -243,6 +247,13 @@ class EnergomeraOptionsFlow(OptionsFlow):
                         default=options.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL),
                     ): vol.All(
                         vol.Coerce(int), vol.Range(min=MIN_SCAN_INTERVAL, max=MAX_SCAN_INTERVAL)
+                    ),
+                    vol.Required(
+                        CONF_IMBALANCE_THRESHOLD,
+                        default=options.get(CONF_IMBALANCE_THRESHOLD, DEFAULT_IMBALANCE_THRESHOLD),
+                    ): vol.All(
+                        vol.Coerce(float),
+                        vol.Range(min=MIN_IMBALANCE_THRESHOLD, max=MAX_IMBALANCE_THRESHOLD),
                     ),
                     vol.Required(
                         CONF_DISCOVER_OTHERS,

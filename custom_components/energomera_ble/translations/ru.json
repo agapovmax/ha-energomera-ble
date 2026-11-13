@@ -53,10 +53,12 @@
         "title": "Параметры опроса",
         "data": {
           "scan_interval": "Интервал опроса, сек",
+          "imbalance_threshold": "Порог перекоса фаз, А",
           "discover_others": "Предлагать добавить другие найденные счётчики"
         },
         "data_description": {
           "scan_interval": "Как часто читать показания. Слишком частый опрос при слабом сигнале даёт больше ошибок.",
+          "imbalance_threshold": "«Перекос фаз» включается, когда разница токов между самой загруженной и самой свободной фазой не меньше этого значения два опроса подряд.",
           "discover_others": "Выключено — Home Assistant не будет показывать «Обнаружено» для чужих счётчиков поблизости (например, соседей на том же столбе). Добавить ещё один свой счётчик всегда можно вручную через «Добавить запись»."
         }
       }
@@ -263,11 +265,87 @@
             "name": "Описание"
           }
         }
+      },
+      "neutral_current": {
+        "name": "Ток в нуле (расчётный)",
+        "state_attributes": {
+          "description": {
+            "name": "Описание"
+          }
+        }
+      },
+      "current_spread": {
+        "name": "Перекос по току",
+        "state_attributes": {
+          "description": {
+            "name": "Описание"
+          }
+        }
+      },
+      "current_imbalance": {
+        "name": "Перекос по току, %",
+        "state_attributes": {
+          "description": {
+            "name": "Описание"
+          }
+        }
+      },
+      "power_spread": {
+        "name": "Перекос по мощности",
+        "state_attributes": {
+          "description": {
+            "name": "Описание"
+          }
+        }
+      },
+      "max_load_phase": {
+        "name": "Самая загруженная фаза",
+        "state_attributes": {
+          "description": {
+            "name": "Описание"
+          }
+        },
+        "state": {
+          "l1": "L1",
+          "l2": "L2",
+          "l3": "L3"
+        }
+      },
+      "min_load_phase": {
+        "name": "Самая свободная фаза",
+        "state_attributes": {
+          "description": {
+            "name": "Описание"
+          }
+        },
+        "state": {
+          "l1": "L1",
+          "l2": "L2",
+          "l3": "L3"
+        }
       }
     },
     "button": {
       "refresh": {
         "name": "Опросить сейчас"
+      }
+    },
+    "binary_sensor": {
+      "phase_imbalance": {
+        "name": "Перекос фаз",
+        "state_attributes": {
+          "description": {
+            "name": "Описание"
+          }
+        }
+      },
+      "neutral_break": {
+        "name": "Подозрение на обрыв нуля",
+        "state_attributes": {
+          "description": {
+            "name": "Описание"
+          }
+        }
       }
     }
   }

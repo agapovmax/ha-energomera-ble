@@ -32,10 +32,17 @@ def test_strings_json_matches_english():
 
 
 @pytest.mark.parametrize("lang", ["ru", "en"])
-def test_every_sensor_has_description(lang):
+@pytest.mark.parametrize("platform", ["sensor", "binary_sensor"])
+def test_every_entity_has_description(lang, platform):
     describe = _descriptions().describe
-    for key in _translations(lang)["entity"]["sensor"]:
+    for key in _translations(lang)["entity"][platform]:
         assert describe(key, lang), key
+
+
+def test_same_binary_sensor_keys_in_all_languages():
+    assert set(_translations("ru")["entity"]["binary_sensor"]) == set(
+        _translations("en")["entity"]["binary_sensor"]
+    )
 
 
 def test_unknown_language_falls_back_to_english():
