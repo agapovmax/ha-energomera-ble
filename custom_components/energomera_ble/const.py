@@ -11,6 +11,11 @@ DEFAULT_DISCOVER_OTHERS = False
 CONF_IMBALANCE_THRESHOLD = "imbalance_threshold"
 MIN_IMBALANCE_THRESHOLD = 1
 MAX_IMBALANCE_THRESHOLD = 100
+# Номинал вводного автомата, А, и выделенная мощность по договору, кВт (0 — не задано)
+CONF_BREAKER_RATING = "breaker_rating"
+CONF_ALLOCATED_POWER = "allocated_power"
+MAX_BREAKER_RATING = 250
+MAX_ALLOCATED_POWER = 1000
 
 DEFAULT_SCAN_INTERVAL = 120  # секунд
 MIN_SCAN_INTERVAL = 30

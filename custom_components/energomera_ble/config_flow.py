@@ -14,6 +14,8 @@ from homeassistant.const import CONF_ADDRESS, CONF_SCAN_INTERVAL
 from homeassistant.core import HomeAssistant, callback
 
 from .const import (
+    CONF_ALLOCATED_POWER,
+    CONF_BREAKER_RATING,
     CONF_DISCOVER_OTHERS,
     CONF_IMBALANCE_THRESHOLD,
     CONF_PIN,
@@ -21,6 +23,8 @@ from .const import (
     DEFAULT_DISCOVER_OTHERS,
     DEFAULT_SCAN_INTERVAL,
     DOMAIN,
+    MAX_ALLOCATED_POWER,
+    MAX_BREAKER_RATING,
     MAX_IMBALANCE_THRESHOLD,
     MAX_SCAN_INTERVAL,
     MIN_IMBALANCE_THRESHOLD,
@@ -255,6 +259,12 @@ class EnergomeraOptionsFlow(OptionsFlow):
                         vol.Coerce(float),
                         vol.Range(min=MIN_IMBALANCE_THRESHOLD, max=MAX_IMBALANCE_THRESHOLD),
                     ),
+                    vol.Required(
+                        CONF_BREAKER_RATING, default=options.get(CONF_BREAKER_RATING, 0)
+                    ): vol.All(vol.Coerce(float), vol.Range(min=0, max=MAX_BREAKER_RATING)),
+                    vol.Required(
+                        CONF_ALLOCATED_POWER, default=options.get(CONF_ALLOCATED_POWER, 0)
+                    ): vol.All(vol.Coerce(float), vol.Range(min=0, max=MAX_ALLOCATED_POWER)),
                     vol.Required(
                         CONF_DISCOVER_OTHERS,
                         default=options.get(CONF_DISCOVER_OTHERS, DEFAULT_DISCOVER_OTHERS),

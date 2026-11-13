@@ -85,6 +85,27 @@ _EN.update(
     }
 )
 
+_RU["power_load"] = (
+    "Текущая мощность в % от выделенной по договору (задаётся в параметрах интеграции). "
+    "Около 100 % и выше — сеть может отключить за превышение, а вводной автомат — сработать."
+)
+_EN["power_load"] = (
+    "Current power in % of the contracted allocated power (set in the integration options). "
+    "Near or above 100 % the grid may cut you off and the main breaker may trip."
+)
+
+for _i in (1, 2, 3):
+    _RU[f"phase_load_l{_i}"] = (
+        f"Ток фазы L{_i} в % от номинала вводного автомата (задаётся в параметрах интеграции). "
+        "По ГОСТ IEC 60898 автомат держит 113 % не меньше часа, а при 145 % срабатывает в течение "
+        "часа (при большем токе — быстрее): следите, чтобы фаза не держалась долго выше 100 %."
+    )
+    _EN[f"phase_load_l{_i}"] = (
+        f"Phase L{_i} current in % of the main breaker rating (set in the integration options). "
+        "Per IEC 60898 a breaker holds 113 % for at least an hour and trips within an hour at 145 % "
+        "(faster at higher current): avoid keeping a phase above 100 % for long."
+    )
+
 for _i in (1, 2, 3):
     _RU[f"energy_l{_i}"] = f"Энергия, учтённая по фазе L{_i} с начала эксплуатации."
     _EN[f"energy_l{_i}"] = f"Energy recorded on phase L{_i} since commissioning."

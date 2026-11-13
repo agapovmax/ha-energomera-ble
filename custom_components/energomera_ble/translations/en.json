@@ -54,11 +54,15 @@
         "data": {
           "scan_interval": "Polling interval, seconds",
           "imbalance_threshold": "Phase imbalance threshold, A",
+          "breaker_rating": "Main breaker rating, A",
+          "allocated_power": "Allocated power, kW",
           "discover_others": "Offer to add other discovered meters"
         },
         "data_description": {
           "scan_interval": "How often to read the meter. Polling too often with a weak signal causes more errors.",
           "imbalance_threshold": "\"Phase imbalance\" turns on when the current difference between the most and least loaded phase is at least this value for two polls in a row.",
+          "breaker_rating": "For the \"Phase L1–L3 load\" sensors — phase current in % of the breaker rating. 0 hides them.",
+          "allocated_power": "Contracted power from your grid connection agreement. For the \"Allocated power load\" sensor. 0 hides it.",
           "discover_others": "When off, Home Assistant will not show \"Discovered\" cards for other meters nearby (e.g. neighbours on the same pole). You can always add another meter of your own manually with \"Add entry\"."
         }
       }
@@ -322,6 +326,38 @@
           "l1": "L1",
           "l2": "L2",
           "l3": "L3"
+        }
+      },
+      "phase_load_l1": {
+        "name": "Phase L1 load",
+        "state_attributes": {
+          "description": {
+            "name": "Description"
+          }
+        }
+      },
+      "phase_load_l2": {
+        "name": "Phase L2 load",
+        "state_attributes": {
+          "description": {
+            "name": "Description"
+          }
+        }
+      },
+      "phase_load_l3": {
+        "name": "Phase L3 load",
+        "state_attributes": {
+          "description": {
+            "name": "Description"
+          }
+        }
+      },
+      "power_load": {
+        "name": "Allocated power load",
+        "state_attributes": {
+          "description": {
+            "name": "Description"
+          }
         }
       }
     },

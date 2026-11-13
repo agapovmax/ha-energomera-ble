@@ -87,6 +87,17 @@ SENSORS: tuple[SensorEntityDescription, ...] = (
         suggested_display_precision=0,
     ),
     _measure("power_spread", UnitOfPower.KILO_WATT, SensorDeviceClass.POWER, 3),
+    # --- загрузка относительно автомата и выделенной мощности (если заданы в параметрах) ---
+    *(
+        SensorEntityDescription(
+            key=key,
+            translation_key=key,
+            native_unit_of_measurement=PERCENTAGE,
+            state_class=SensorStateClass.MEASUREMENT,
+            suggested_display_precision=0,
+        )
+        for key in ("phase_load_l1", "phase_load_l2", "phase_load_l3", "power_load")
+    ),
     *(
         SensorEntityDescription(
             key=key,

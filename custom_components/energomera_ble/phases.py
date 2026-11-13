@@ -101,3 +101,32 @@ def derive(values: dict[str, Any], threshold: float, imbalance: Debounce) -> dic
         out["neutral_break"] = neutral_break_suspected(voltages)
 
     return out
+
+
+def _percent(value: float, limit: float) -> float:
+    return round(value / limit * 100, 1)
+
+
+def derive_limits(values: dict[str, Any], breaker_rating: float, allocated_power: float) -> dict[str, Any]:
+    """Загрузка относительно вводного автомата (А) и выделенной мощности (кВт).
+
+    Параметр, равный 0, выключает соответствующие сенсоры.
+    """
+    out: dict[str, Any] = {}
+
+    if breaker_rating > 0:
+        for p in PHASES:
+            current = values.get(f"current_{p}")
+            if isinstance(current, (int, float)):
+                out[f"phase_load_{p}"] = _percent(current, breaker_rating)
+
+    if allocated_power > 0:
+        power = values.get("power_total")
+        if not isinstance(power, (int, float)):
+            # однофазный счётчик может не отдавать сумму — складываем фазы
+            phase_powers = [values[k] for k in (f"power_{p}" for p in PHASES) if isinstance(values.get(k), (int, float))]
+            power = sum(phase_powers) if phase_powers else None
+        if power is not None:
+            out["power_load"] = _percent(power, allocated_power)
+
+    return out

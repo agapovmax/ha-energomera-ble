@@ -115,3 +115,30 @@ def test_derive_low_load_keeps_imbalance_key(phases):
 def test_derive_single_phase_is_empty(phases):
     values = {"current_l1": 5.0, "power_l1": 1.1, "voltage_l1": 230.0}
     assert phases.derive(values, 10, phases.Debounce()) == {}
+
+
+# --- загрузка относительно автомата и выделенной мощности -----------------
+
+
+def test_limits_disabled_by_default(phases):
+    assert phases.derive_limits(_three_phase(), 0, 0) == {}
+
+
+def test_phase_load(phases):
+    out = phases.derive_limits(_three_phase(), 25, 0)
+    assert out == {"phase_load_l1": 80.0, "phase_load_l2": 8.0, "phase_load_l3": 20.0}
+
+
+def test_power_load_uses_total(phases):
+    out = phases.derive_limits(_three_phase(power_total=7.5), 0, 15)
+    assert out == {"power_load": 50.0}
+
+
+def test_power_load_sums_phases_without_total(phases):
+    out = phases.derive_limits(_three_phase(), 0, 12)  # 4.5 + 0.4 + 1.1 = 6.0
+    assert out == {"power_load": 50.0}
+
+
+def test_limits_single_phase(phases):
+    values = {"current_l1": 12.5, "power_l1": 2.7}
+    assert phases.derive_limits(values, 25, 5) == {"phase_load_l1": 50.0, "power_load": 54.0}
