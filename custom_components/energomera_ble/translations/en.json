@@ -1,0 +1,28 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Energomera meter (BLE)",
+        "description": "Select your meter by its serial number (printed on the case and in the meter's passport) and enter the PIN — the 6-digit \"BLE radio interface password\" from the passport. The CE901 display unit shows it as well.",
+        "data": {"address": "Meter", "pin": "PIN (BLE password)"}
+      }
+    },
+    "error": {
+      "invalid_pin": "The meter rejected the PIN. Check the BLE password in the passport.",
+      "pairing_failed": "Pairing failed (weak signal or the meter is busy). Please try again.",
+      "cannot_connect": "Could not read data from the meter. Please try again — the signal is weak."
+    },
+    "abort": {
+      "no_devices_found": "No CE208/CE308 meters found over Bluetooth.",
+      "already_configured": "This meter is already configured."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Polling options",
+        "data": {"scan_interval": "Polling interval, seconds"}
+      }
+    }
+  }
+}
