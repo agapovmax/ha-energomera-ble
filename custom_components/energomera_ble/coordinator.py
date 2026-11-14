@@ -12,6 +12,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_ADDRESS, CONF_SCAN_INTERVAL
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryAuthFailed
+from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
 from .const import (
@@ -81,8 +82,9 @@ class EnergomeraCoordinator(DataUpdateCoordinator[MeterData]):
         except (BleakError, MeterProtocolError, TimeoutError, OSError) as err:
             return self._fail(f"Ошибка чтения: {err}")
 
-        if data.serial:
+        if data.serial and data.serial != self.serial:
             self.serial = data.serial
+            self._async_update_device_serial()
         if self.rssi is not None:
             data.values["rssi"] = self.rssi
         data.values.update(derive(data.values, self.imbalance_threshold, self._imbalance))
@@ -90,6 +92,13 @@ class EnergomeraCoordinator(DataUpdateCoordinator[MeterData]):
         self._last_success = time.monotonic()
         self.last_error = None
         return data
+
+    def _async_update_device_serial(self) -> None:
+        """Объекты создаются до первого опроса — серийник дописываем в устройство отдельно."""
+        registry = dr.async_get(self.hass)
+        device = registry.async_get_device(identifiers={(DOMAIN, self.address)})
+        if device is not None and device.serial_number != self.serial:
+            registry.async_update_device(device.id, serial_number=self.serial)
 
     def _fail(self, message: str) -> MeterData:
         self.last_error = message

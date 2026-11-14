@@ -19,10 +19,14 @@ async def async_setup_entry(hass: HomeAssistant, entry: EnergomeraConfigEntry) -
     # до первого опроса: счётчик может быть недоступен, а карточки соседей убрать нужно
     _async_dismiss_discoveries(hass)
     coordinator = EnergomeraCoordinator(hass, entry)
-    await coordinator.async_config_entry_first_refresh()
     entry.runtime_data = coordinator
     entry.async_on_unload(entry.add_update_listener(_async_reload))
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
+    # опрос по Bluetooth идёт до полуминуты — не держим им запуск Home Assistant;
+    # объекты из реестра уже созданы, новые добавятся, когда придут данные
+    entry.async_create_background_task(
+        hass, coordinator.async_refresh(), f"{DOMAIN} first refresh {coordinator.address}"
+    )
     return True
 
 

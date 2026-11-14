@@ -24,6 +24,8 @@
 - Показания по протоколу МЭК 61107 (ГОСТ Р МЭК 61107) поверх BLE.
 - Устойчивость к слабому сигналу: при единичных сбоях сохраняются последние показания
   (до 15 минут), объекты не «мигают» недоступностью.
+- **Быстрый запуск**: Home Assistant не ждёт ответа счётчика при загрузке — первый опрос
+  идёт в фоне, показания появляются через 10–20 секунд.
 - Совместимость с панелью «Энергия» Home Assistant.
 - Кнопка **«Опросить сейчас»** для внеочередного чтения показаний.
 - **Смена PIN без удаления интеграции**: если счётчик отверг PIN, Home Assistant
@@ -170,7 +172,8 @@ Install via HACS as a custom repository (`Integration` type) or copy
 **Energomera BLE** in *Settings → Devices & services* (meters are usually
 discovered automatically). Three-phase meters also get neutral current, phase imbalance sensors and
 alarms for phase imbalance and a suspected broken neutral. Includes a *Poll now* button, re-authentication when
-the PIN changes, a reconfigure flow and downloadable diagnostics. You will need the 6-digit
+the PIN changes, a reconfigure flow and downloadable diagnostics. Startup is not blocked by the
+first BLE poll: readings arrive in the background a few seconds later. You will need the 6-digit
 BLE PIN from the meter's passport and a **local** Bluetooth adapter (pairing goes
 through BlueZ, so ESPHome Bluetooth proxies are not supported for pairing).
 

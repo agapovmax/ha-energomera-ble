@@ -11,7 +11,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from . import EnergomeraConfigEntry
-from .entity import EnergomeraEntity
+from .entity import EnergomeraEntity, async_add_meter_entities
 
 BINARY_SENSORS: tuple[BinarySensorEntityDescription, ...] = (
     BinarySensorEntityDescription(
@@ -30,10 +30,8 @@ BINARY_SENSORS: tuple[BinarySensorEntityDescription, ...] = (
 async def async_setup_entry(
     hass: HomeAssistant, entry: EnergomeraConfigEntry, async_add_entities: AddEntitiesCallback
 ) -> None:
-    coordinator = entry.runtime_data
-    present = set(coordinator.data.values)
-    async_add_entities(
-        EnergomeraBinarySensor(coordinator, d) for d in BINARY_SENSORS if d.key in present
+    async_add_meter_entities(
+        entry, entry.runtime_data, BINARY_SENSORS, EnergomeraBinarySensor, async_add_entities
     )
 
 
@@ -42,8 +40,13 @@ class EnergomeraBinarySensor(EnergomeraEntity, BinarySensorEntity):
 
     @property
     def is_on(self) -> bool | None:
-        return self.coordinator.data.values.get(self.entity_description.key)
+        if (data := self.coordinator.data) is None:
+            return None
+        return data.values.get(self.entity_description.key)
 
     @property
     def available(self) -> bool:
-        return super().available and self.entity_description.key in self.coordinator.data.values
+        data = self.coordinator.data
+        return (
+            super().available and data is not None and self.entity_description.key in data.values
+        )

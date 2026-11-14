@@ -23,7 +23,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from . import EnergomeraConfigEntry
-from .entity import EnergomeraEntity
+from .entity import EnergomeraEntity, async_add_meter_entities
 
 # Названия объектов — в translations/*.json (entity.sensor.<key>.name).
 
@@ -130,9 +130,9 @@ SENSORS: tuple[SensorEntityDescription, ...] = (
 async def async_setup_entry(
     hass: HomeAssistant, entry: EnergomeraConfigEntry, async_add_entities: AddEntitiesCallback
 ) -> None:
-    coordinator = entry.runtime_data
-    present = set(coordinator.data.values) | {"rssi"}
-    async_add_entities(EnergomeraSensor(coordinator, d) for d in SENSORS if d.key in present)
+    async_add_meter_entities(
+        entry, entry.runtime_data, SENSORS, EnergomeraSensor, async_add_entities, frozenset({"rssi"})
+    )
 
 
 class EnergomeraSensor(EnergomeraEntity, SensorEntity):
@@ -140,8 +140,13 @@ class EnergomeraSensor(EnergomeraEntity, SensorEntity):
 
     @property
     def native_value(self):
-        return self.coordinator.data.values.get(self.entity_description.key)
+        if (data := self.coordinator.data) is None:
+            return None
+        return data.values.get(self.entity_description.key)
 
     @property
     def available(self) -> bool:
-        return super().available and self.entity_description.key in self.coordinator.data.values
+        data = self.coordinator.data
+        return (
+            super().available and data is not None and self.entity_description.key in data.values
+        )
