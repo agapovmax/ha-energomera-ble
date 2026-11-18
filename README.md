@@ -4,9 +4,11 @@
 
 # Энергомера BLE (CE208/CE308) для Home Assistant
 
-[![HACS Custom](https://img.shields.io/badge/HACS-Custom-41BDF5.svg)](https://hacs.xyz/docs/faq/custom_repositories)
+<!-- ha-marketplace:exclude-start -->
+[![Open in Marketplace](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=agapovmax&repository=ha-energomera-ble&category=integration)
 [![Validate](https://github.com/agapovmax/ha-energomera-ble/actions/workflows/validate.yml/badge.svg)](https://github.com/agapovmax/ha-energomera-ble/actions/workflows/validate.yml)
 [![Tests](https://github.com/agapovmax/ha-energomera-ble/actions/workflows/tests.yml/badge.svg)](https://github.com/agapovmax/ha-energomera-ble/actions/workflows/tests.yml)
+<!-- ha-marketplace:exclude-end -->
 
 Пользовательская интеграция Home Assistant для чтения показаний электросчётчиков
 **Энергомера CE208 / CE308** со встроенным Bluetooth LE-модулем — напрямую,
@@ -91,7 +93,16 @@ ID объекта посмотрите на странице устройств�
 
 ## Установка
 
-### Через HACS (рекомендуется)
+### Через Marketplace (Home Assistant 2026.11 и новее, рекомендуется)
+
+[![Открыть в Marketplace](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=agapovmax&repository=ha-energomera-ble&category=integration)
+
+1. Нажмите кнопку выше (или **Настройки → Marketplace** и найдите «Энергомера BLE»).
+   Если интеграции ещё нет в каталоге, Marketplace предложит добавить репозиторий
+   как пользовательский — согласитесь.
+2. Установите интеграцию и перезапустите Home Assistant.
+
+### Через HACS (Home Assistant 2026.10 и старше)
 
 1. HACS → ⋮ → **Пользовательские репозитории**.
 2. Добавьте `https://github.com/agapovmax/ha-energomera-ble`, тип **Integration**.
@@ -167,7 +178,8 @@ with a built-in Bluetooth LE module. Reads energy (total and per tariff), power,
 current, power factor, frequency and meter temperature directly over BLE using
 IEC 61107 frames — no ESPHome or cloud needed.
 
-Install via HACS as a custom repository (`Integration` type) or copy
+Install from *Settings → Marketplace* (Home Assistant 2026.11+), via HACS as a custom
+repository (`Integration` type) on older versions, or copy
 `custom_components/energomera_ble` into your config folder, restart, then add
 **Energomera BLE** in *Settings → Devices & services* (meters are usually
 discovered automatically). Three-phase meters also get neutral current, phase imbalance sensors and

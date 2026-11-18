@@ -5,7 +5,9 @@ on:
   pull_request:
   workflow_dispatch:
   schedule:
-    - cron: "0 3 * * 1"
+    - cron: "0 3 * * *"
+
+permissions: {}
 
 jobs:
   hassfest:
@@ -20,4 +22,3 @@ jobs:
       - uses: hacs/action@main
         with:
           category: integration
-          ignore: brands
