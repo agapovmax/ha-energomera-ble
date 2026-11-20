@@ -27,3 +27,8 @@ def protocol():
 @pytest.fixture(scope="session")
 def phases():
     return _load("phases")
+
+
+@pytest.fixture(scope="session")
+def redact():
+    return _load("redact")

@@ -11,6 +11,7 @@ from homeassistant.core import HomeAssistant
 
 from . import EnergomeraConfigEntry
 from .const import CONF_PIN, CONF_SERIAL
+from .redact import redact_text
 
 TO_REDACT = {CONF_PIN, CONF_ADDRESS, CONF_SERIAL, "serial", "title", "unique_id"}
 
@@ -34,7 +35,12 @@ async def async_get_config_entry_diagnostics(
         ),
         "coordinator": {
             "last_update_success": coordinator.last_update_success,
-            "last_error": coordinator.last_error,
+            "last_error": redact_text(
+                coordinator.last_error,
+                coordinator.address,
+                coordinator.serial,
+                coordinator.config_entry.data.get(CONF_SERIAL),
+            ),
             "update_interval": str(coordinator.update_interval),
             "serial_known": coordinator.serial is not None,
         },
